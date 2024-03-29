@@ -23,7 +23,6 @@ import com.example.spotifywrap.databinding.FragmentHomeBinding;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private spotifyService apiService;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -33,6 +32,9 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        //set boolean variables for login
+//        authenticateSpotify();
 
         final TextView textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
@@ -44,32 +46,10 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
-    private void endpointCall() {
-
-        // retrieve accessToken after signin
-        String accessToken = "";
-
-        Call<ResponseBody> call = apiService.callEndpoint("Bearer " + accessToken);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                WindowDecorActionBar.TabImpl textView;
-                if (response.isSuccessful()) {
-                    // Handle successful response
-                    ResponseBody responseBody = response.body();
-                    textView.setText(responseBody.toString());
-                } else {
-                    // Handle error response
-                    textView.setText("Error: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                // Handle network errors
-                textView.setText("Network Error: " + t.getMessage());
-            }
-        });
-    }
+//    private void authenticateSpotify() {
+//        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(Variables.CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
+//        builder.setScopes(new String[]{SCOPES});
+//        AuthenticationRequest request = builder.build();
+//        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+//    }
 }
