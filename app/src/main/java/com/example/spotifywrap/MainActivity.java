@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.spotifywrap.R;
 import com.example.spotifywrap.ui.home.Login;
+import com.example.spotifywrap.ui.home.TopInfo;
 import com.example.spotifywrap.ui.home.User;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonMusicTaste;
     private Button buttonDuoWrapped;
     private User user;
+    private TopInfo topInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

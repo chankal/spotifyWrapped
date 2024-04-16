@@ -11,8 +11,8 @@ public class UserInfo
 {
     // the endpoint for getting user info
     private static final String URL = "https://api.spotify.com/v1/me";
-    private SharedPreferences sharedPreferences;
-    private RequestQueue queue;
+    SharedPreferences sharedPreferences;
+    RequestQueue queue;
     private User user;
 
     // the constructor requires the
