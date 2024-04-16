@@ -1,13 +1,20 @@
 package com.example.spotifywrap.ui.home;
 
+import java.util.List;
+
 public class Song {
 
     private String id;
     private String name;
 
-    public Song(String id, String name) {
+    private String imageUrl ;
+    private List<Artist> artists;
+
+    public Song(String id, String name, String imageUrl) {
         this.name = name;
         this.id = id;
+        this.imageUrl = imageUrl;
+
     }
 
     public String getId() {
@@ -24,6 +31,17 @@ public class Song {
 
     public void setName(String name) {
         this.name = name;
+    }
+    public String getImageUrl() { return this.imageUrl; }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl ;
+    }
+    public List<Artist> getArtists() {
+        return this.artists;
+    }
+    public void setArtists(List<Artist> a) {
+        this.artists = a ;
     }
 
 }

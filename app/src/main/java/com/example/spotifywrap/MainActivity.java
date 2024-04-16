@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.spotifywrap.R;
 import com.example.spotifywrap.ui.home.Login;
+import com.example.spotifywrap.ui.home.RecentSongs;
+import com.example.spotifywrap.ui.home.TopTracksActivity;
 import com.example.spotifywrap.ui.home.User;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonYourWrap;
     private Button buttonMusicTaste;
     private Button buttonDuoWrapped;
+    private Button buttonTopTracks;
     private User user;
 
     @Override
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         buttonMusicTaste = findViewById(R.id.buttonMusicTaste);
         buttonDuoWrapped = findViewById(R.id.buttonDuoWrapped);
         sharedPreferences = getSharedPreferences("SPOTIFY", MODE_PRIVATE);
+        buttonTopTracks = findViewById(R.id.buttonTopTracks);
 
         SharedPreferences sharedPreferences = this.getSharedPreferences("SPOTIFY", 0);
         greetingMessage.setText(sharedPreferences.getString("userid", "No User"));
@@ -51,13 +55,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        buttonRecentlyPlayedSong.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, RecentSongs.class);
+            startActivityForResult(intent, 1);
+        }
+
+        });
+
+        buttonTopTracks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, TopTracksActivity.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // can get sharedPreference
 
         if (requestCode == LOGIN_REQUEST_CODE) {
 
@@ -91,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         buttonYourWrap.setVisibility(View.VISIBLE);
         buttonMusicTaste.setVisibility(View.VISIBLE);
         buttonDuoWrapped.setVisibility(View.VISIBLE);
+        buttonTopTracks.setVisibility(View.VISIBLE);
     }
     private void showGreetingMessage() {
         greetingMessage.setVisibility(View.VISIBLE);

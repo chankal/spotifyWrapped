@@ -71,7 +71,7 @@ public class HomeFragment extends Fragment {
         songService = new SongService(requireContext().getApplicationContext());
 
         VolleyCallBack callBack ;
-        songService.getTracks(() -> {
+        songService.getTopTracks(() -> {
             tracks = songService.getSongs();
             updateSong();
 

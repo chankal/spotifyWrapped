@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:paddingTop="?attr/actionBarSize">
 
-
     <Button
         android:id="@+id/buttonSpotifyLogin"
         android:layout_width="wrap_content"
@@ -31,31 +30,40 @@
 
     <Button
         android:id="@+id/buttonRecentlyPlayedSong"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Get Recently Played Song"
         android:visibility="gone"
-
         app:layout_constraintTop_toBottomOf="@id/greetingMessage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
 
     <Button
-        android:id="@+id/buttonYourWrap"
-        android:layout_width="match_parent"
+        android:id="@+id/buttonTopTracks"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Your Wrap"
+        android:text="Top Tracks"
         android:visibility="gone"
-
         app:layout_constraintTop_toBottomOf="@id/buttonRecentlyPlayedSong"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
 
     <Button
+        android:id="@+id/buttonYourWrap"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Your Wrap"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/buttonTopTracks"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <Button
         android:id="@+id/buttonMusicTaste"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Music Taste"
         android:visibility="gone"
@@ -66,7 +74,7 @@
 
     <Button
         android:id="@+id/buttonDuoWrapped"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Duo Wrapped"
         android:visibility="gone"
@@ -74,8 +82,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
