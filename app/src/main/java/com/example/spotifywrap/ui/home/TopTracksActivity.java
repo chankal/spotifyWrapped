@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import com.example.spotifywrap.ui.home.Song;
 import com.example.spotifywrap.ui.home.SongAdapter;
 import com.example.spotifywrap.ui.home.SongService;
-
 public class TopTracksActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -49,14 +48,14 @@ public class TopTracksActivity extends AppCompatActivity {
             updateSong();
         });
     }
-    private void updateSong() {
 
+    private void updateSong() {
         if (topTracks.size() > 0) {
             adapter = new SongAdapter(this, topTracks);
             recyclerView.setAdapter(adapter);
+        } else {
+            // Show a message or handle the case where no songs are retrieved
+            Toast.makeText(this, "No songs found", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 }
-

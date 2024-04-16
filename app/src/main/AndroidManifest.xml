@@ -15,6 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SpotifyWrap"
         tools:targetApi="31">
+
+        <activity
+            android:name=".ui.home.TopArtists"
+            android:exported="false"
+            android:label="@string/title_activity_top_artists"
+            android:theme="@style/Theme.SpotifyWrap" />
+
         <activity
             android:name=".ui.home.RecentSongs"
             android:exported="false"
@@ -22,11 +29,8 @@
             android:theme="@style/Theme.SpotifyWrap" />
         <activity
             android:name=".ui.home.TopTracksActivity"
-            android:label="activity_top_tracks"
-            android:exported="false">
-        </activity>
-
-
+            android:exported="false"
+            android:label="activity_top_tracks"></activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -39,8 +43,8 @@
         </activity>
         <activity
             android:name=".ui.home.Login"
-            android:label="Login"></activity>
-
+            android:label="Login" />
     </application>
+
 
 </manifest>

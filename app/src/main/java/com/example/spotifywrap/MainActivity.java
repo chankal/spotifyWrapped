@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.spotifywrap.R;
 import com.example.spotifywrap.ui.home.Login;
 import com.example.spotifywrap.ui.home.RecentSongs;
+import com.example.spotifywrap.ui.home.TopArtists;
 import com.example.spotifywrap.ui.home.TopTracksActivity;
 import com.example.spotifywrap.ui.home.User;
 
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonMusicTaste;
     private Button buttonDuoWrapped;
     private Button buttonTopTracks;
+    private Button buttonTopArtists;
+
     private User user;
 
     @Override
@@ -70,6 +73,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
+        buttonTopArtists = findViewById(R.id.buttonTopArtists); // Initialize buttonTopArtists
+
+        buttonTopArtists.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, TopArtists.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -103,13 +115,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void showAuthenticatedViews() {
         greetingMessage.setVisibility(View.VISIBLE);
-        greetingMessage.setText("Welcome," + sharedPreferences.getString("username", "No User"));
+        greetingMessage.setText("Welcome, " + sharedPreferences.getString("username", "No User"));
         buttonSpotifyLogin.setVisibility(View.GONE);
         buttonRecentlyPlayedSong.setVisibility(View.VISIBLE);
         buttonYourWrap.setVisibility(View.VISIBLE);
         buttonMusicTaste.setVisibility(View.VISIBLE);
         buttonDuoWrapped.setVisibility(View.VISIBLE);
         buttonTopTracks.setVisibility(View.VISIBLE);
+        buttonTopArtists.setVisibility(View.VISIBLE);
     }
     private void showGreetingMessage() {
         greetingMessage.setVisibility(View.VISIBLE);

@@ -22,6 +22,7 @@ import java.util.Map;
 
 public class SongService {
     private ArrayList<Song> songs = new ArrayList<>();
+    private ArrayList<Artist> artists = new ArrayList<>();
     private SharedPreferences sharedPreferences;
     private RequestQueue queue;
 
@@ -33,10 +34,12 @@ public class SongService {
     public ArrayList<Song> getSongs() {
         return songs;
     }
+    public ArrayList<Artist> getArtists() {return artists;}
 
     public ArrayList<Song> getRecentlyPlayedTracks(final VolleyCallBack callBack) {
         String endpoint = "https://api.spotify.com/v1/me/player/recently-played";
         //filter get unique one -> wrap up
+        songs.clear();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, endpoint, null, response -> {
                     Gson gson = new Gson();
@@ -102,44 +105,47 @@ public class SongService {
         return songs;
     }
 
-
     public ArrayList<Song> getTopTracks(final VolleyCallBack callBack) {
         String url = "https://api.spotify.com/v1/me/top/tracks";
+        songs.clear(); // Clear the existing list before adding new songs
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, response -> {
                     Gson gson = new Gson();
                     JSONArray jsonArray = response.optJSONArray("items");
                     Log.d("STARTING", "list of songs" + jsonArray);
 
-
                     for (int n = 0; n < jsonArray.length(); n++) {
                         try {
                             JSONObject object = jsonArray.getJSONObject(n);
-                            object = object.optJSONObject("track");
+                            Log.d("STARTING", "Object" + object.toString());
                             JSONObject albumObject = object.getJSONObject("album");
-                            JSONArray artistsArray = object.getJSONArray("artists");
+                            JSONArray artistsArray = albumObject.getJSONArray("artists");
                             List<Artist> artists = new ArrayList<>();
                             for (int i = 0; i < artistsArray.length(); i++) {
                                 JSONObject artistObject = artistsArray.getJSONObject(i);
                                 String artistName = artistObject.getString("name");
-                                String imageUrl = ""; // You can add image URL retrieval here if needed
-                                Artist artist = new Artist(artistName, imageUrl);
+                                Artist artist = new Artist(artistName);
                                 artists.add(artist);
                             }
 
+                            Log.d("STARTING", "ALbum" + albumObject.toString()) ;
+                            Log.d("STARTING", "artists" + artistsArray.toString()) ;
+
 
                             JSONArray imagesArray = albumObject.getJSONArray("images");
+                            Log.d("STARTING", "Img url" + imagesArray.toString());
+
                             String imageUrl = imagesArray.getJSONObject(0).getString("url");
-                            Log.d("STARTING", "GOT SONGS" + object.toString());
+                            Log.d("STARTING", "GOT SONGS" + albumObject.toString());
 
-
-                            Song song = gson.fromJson(object.toString(), Song.class);
-
+                            Song song = gson.fromJson(albumObject.toString(), Song.class);
                             song.setArtists(artists);
-
                             song.setImageUrl(imageUrl);
 
-                            songs.add(song);
+                            songs.add(song); // Add the song to the list
+
+                            Log.d("STARTING", "Song name" +song.getName()+song.getImageUrl() + song.getArtists().get(0).getName().toString()) ;
+
                             Log.d("STARTING", "Added songs");
 
                         } catch (JSONException e) {
@@ -147,7 +153,7 @@ public class SongService {
                             Log.d("STARTING", "oops error" + e.toString());
                         }
                     }
-                    callBack.onSuccess();
+                    callBack.onSuccess(); // Pass the list of songs to the callback
                 }, error -> {
 
                 }) {
@@ -163,6 +169,57 @@ public class SongService {
         queue.add(jsonObjectRequest);
         return songs;
     }
+
+    public ArrayList<Artist> getTopArtists(final VolleyCallBack callBack) {
+        String timeRange = "long_term"; // Set the time range to long_term
+        int limit = 5; // Limit the result to 5 artists
+
+        String url = "https://api.spotify.com/v1/me/top/artists?type=artists&time_range=" + timeRange + "&limit=" + limit;
+//        String url = "https://api.spotify.com/v1/me/top/artists/";
+        artists.clear();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, response -> {
+                    Gson gson = new Gson();
+                    JSONArray jsonArray = response.optJSONArray("items");
+
+                    for (int n = 0; n < jsonArray.length(); n++) {
+                        try {
+                            JSONObject object = jsonArray.getJSONObject(n);
+                            Log.d("STARTING", "Object" + object.toString());
+                            String artistName = object.getString("name");
+                            JSONArray jsonGenre = object.getJSONArray("genres") ;
+
+                            ArrayList<String> genre = new ArrayList<String>();
+                            for (int i = 0 ;i < jsonGenre.length(); i ++) {
+                                genre.add(jsonGenre.getString(i));
+                            }
+                            String imageUrl = object.getJSONArray("images").getJSONObject(0).getString("url");
+                            Artist artist = new Artist(artistName, imageUrl, genre);
+                            artists.add(artist);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d("STARTING", "oops error" + e.toString());
+                        }
+                    }
+                    callBack.onSuccess(); // Pass the list of songs to the callback
+                }, error -> {
+
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String token = sharedPreferences.getString("token", "");
+                String auth = "Bearer " + token;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
+        queue.add(jsonObjectRequest);
+        return artists; // Return the class-level ArrayList of songs
+    }
+
+
 
     public interface VolleyCallBack {
         void onSuccess();
