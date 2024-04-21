@@ -51,5 +51,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_recent_songs">RecentSongs</string>
     <string name="title_activity_top_artists">TopArtists</string>
+    <string name="title_activity_your_wrap">YourWrap</string>
+    <string name="title_activity_duo_wrap">DuoWrap</string>
+    <string name="title_activity_display_duo_wrap">DisplayDuoWrapActivity</string>
+    <string name="title_activity_change_account">ChangeAccount</string>
 
 </resources>

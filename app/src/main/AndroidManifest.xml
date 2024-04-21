@@ -15,13 +15,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SpotifyWrap"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ui.home.ChangeAccount"
+            android:exported="false"
+            android:label="@string/title_activity_change_account"
+            android:theme="@style/Theme.SpotifyWrap" />
+        <activity
+            android:name=".ui.home.DisplayDuoWrapActivity"
+            android:exported="false"
+            android:label="@string/title_activity_display_duo_wrap"
+            android:theme="@style/Theme.SpotifyWrap" />
+        <activity
+            android:name=".ui.home.DuoWrap"
+            android:exported="false"
+            android:label="@string/title_activity_duo_wrap"
+            android:theme="@style/Theme.SpotifyWrap" />
+        <activity
+            android:name=".ui.home.YourWrap"
+            android:exported="false"
+            android:label="@string/title_activity_your_wrap"
+            android:theme="@style/Theme.SpotifyWrap" />
         <activity
             android:name=".ui.home.TopArtists"
             android:exported="false"
             android:label="@string/title_activity_top_artists"
             android:theme="@style/Theme.SpotifyWrap" />
-
         <activity
             android:name=".ui.home.RecentSongs"
             android:exported="false"
@@ -30,7 +48,7 @@
         <activity
             android:name=".ui.home.TopTracksActivity"
             android:exported="false"
-            android:label="activity_top_tracks"></activity>
+            android:label="activity_top_tracks" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -44,7 +62,7 @@
         <activity
             android:name=".ui.home.Login"
             android:label="Login" />
+        <activity android:name=".ui.home.TopGenre" />
     </application>
-
 
 </manifest>

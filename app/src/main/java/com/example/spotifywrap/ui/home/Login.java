@@ -34,12 +34,13 @@ public class Login extends AppCompatActivity{
         setContentView(R.layout.login_page); //mb logging in load page
 
 
-        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(Variables.CLIENT_ID, AuthorizationResponse.Type.TOKEN, Variables.REDIRECT_URI);
+        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(Variables.CLIENT_ID, AuthorizationResponse.Type.TOKEN, Variables.REDIRECT_URI)
+                .setShowDialog(true);
         builder.setScopes(new String[]{Variables.SCOPES});
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(this, Variables.REQUEST_CODE, request);
 
-        sharedPreferences = this.getSharedPreferences("SPOTIFY", 0);
+        sharedPreferences = getSharedPreferences("SPOTIFY", 0);
         requestQueue = Volley.newRequestQueue(this);
 
     }
@@ -72,6 +73,7 @@ public class Login extends AppCompatActivity{
                         editor = getSharedPreferences("SPOTIFY", 0).edit();
                         editor.putString("userid", user.id);
                         editor.putString("username", user.display_name);
+                        editor.putString("email",user.email);
                         Log.d("STARTING", "GOT USER INFORMATION" + user.display_name);
                         editor.commit();
 

@@ -38,7 +38,6 @@ public class SpotifyService {
     private User user;
 
 
-
     public SpotifyService(RequestQueue queue, SharedPreferences sharedPreferences) {
         this.queue = queue;
         this.sharedPreferences = sharedPreferences;

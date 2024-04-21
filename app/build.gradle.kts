@@ -1,5 +1,7 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -46,6 +48,10 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.spotify.android:auth:1.2.5")
     implementation("com.squareup.picasso:picasso:2.8")
+    implementation(platform("com.google.firebase:firebase-bom:29.0.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.gms:google-services:4.3.0")
 
 
 }

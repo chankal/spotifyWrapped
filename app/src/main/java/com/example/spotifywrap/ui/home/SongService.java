@@ -17,8 +17,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SongService {
     private ArrayList<Song> songs = new ArrayList<>();
@@ -62,7 +64,6 @@ public class SongService {
                                 artists.add(artist);
                             }
 
-
 //                            JSONArray artistsArray = object.getJSONArray("artists");
 //                            String artistName = artistsArray.getJSONObject(0).getString("name");
 //                            Log.d("STARTING", "ARTIST" + artistName);
@@ -105,8 +106,9 @@ public class SongService {
         return songs;
     }
 
-    public ArrayList<Song> getTopTracks(final VolleyCallBack callBack) {
-        String url = "https://api.spotify.com/v1/me/top/tracks";
+    public ArrayList<Song> getTopTracks(final VolleyCallBack callBack, String timeRange, int limit ) {
+
+        String url = "https://api.spotify.com/v1/me/top/tracks?type=artists&time_range=" + timeRange + "&limit=" + limit;
         songs.clear(); // Clear the existing list before adding new songs
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, response -> {
@@ -128,7 +130,74 @@ public class SongService {
                                 artists.add(artist);
                             }
 
-                            Log.d("STARTING", "ALbum" + albumObject.toString()) ;
+                            Log.d("STARTING", "Album" + albumObject.toString()) ;
+                            Log.d("STARTING", "artists" + artistsArray.toString()) ;
+
+
+                            JSONArray imagesArray = albumObject.getJSONArray("images");
+                            Log.d("STARTING", "Img url" + imagesArray.toString());
+
+                            String imageUrl = imagesArray.getJSONObject(0).getString("url");
+                            Log.d("STARTING", "GOT SONGS" + albumObject.toString());
+
+                            Song song = gson.fromJson(albumObject.toString(), Song.class);
+                            song.setArtists(artists);
+                            song.setImageUrl(imageUrl);
+
+                            songs.add(song); // Add the song to the list
+
+                            Log.d("STARTING", "Song name" +song.getName()+song.getImageUrl() + song.getArtists().get(0).getName().toString()) ;
+
+                            Log.d("STARTING", "Added songs");
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d("STARTING", "oops error" + e.toString());
+                        }
+                    }
+                    callBack.onSuccess(); // Pass the list of songs to the callback
+                }, error -> {
+
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String token = sharedPreferences.getString("token", "");
+                String auth = "Bearer " + token;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
+        queue.add(jsonObjectRequest);
+        return songs;
+    }
+    public ArrayList<Song> getTopTracks(final VolleyCallBack callBack ) {
+        String timeRange = "long_term"; // Set the time range to long_term
+        int limit = 20; // Limit the result to 5 artists
+
+        String url = "https://api.spotify.com/v1/me/top/tracks?type=artists&time_range=" + timeRange + "&limit=" + limit;
+        songs.clear();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, response -> {
+                    Gson gson = new Gson();
+                    JSONArray jsonArray = response.optJSONArray("items");
+                    Log.d("STARTING", "list of songs" + jsonArray);
+
+                    for (int n = 0; n < jsonArray.length(); n++) {
+                        try {
+                            JSONObject object = jsonArray.getJSONObject(n);
+                            Log.d("STARTING", "Object" + object.toString());
+                            JSONObject albumObject = object.getJSONObject("album");
+                            JSONArray artistsArray = albumObject.getJSONArray("artists");
+                            List<Artist> artists = new ArrayList<>();
+                            for (int i = 0; i < artistsArray.length(); i++) {
+                                JSONObject artistObject = artistsArray.getJSONObject(i);
+                                String artistName = artistObject.getString("name");
+                                Artist artist = new Artist(artistName);
+                                artists.add(artist);
+                            }
+
+                            Log.d("STARTING", "Album" + albumObject.toString()) ;
                             Log.d("STARTING", "artists" + artistsArray.toString()) ;
 
 
@@ -172,7 +241,7 @@ public class SongService {
 
     public ArrayList<Artist> getTopArtists(final VolleyCallBack callBack) {
         String timeRange = "long_term"; // Set the time range to long_term
-        int limit = 5; // Limit the result to 5 artists
+        int limit = 10; // Limit the result to 5 artists
 
         String url = "https://api.spotify.com/v1/me/top/artists?type=artists&time_range=" + timeRange + "&limit=" + limit;
 //        String url = "https://api.spotify.com/v1/me/top/artists/";
@@ -225,6 +294,13 @@ public class SongService {
         void onSuccess();
     }
 
+    private HashMap<String, Object> createResult(ArrayList<Song> tracks, ArrayList<Artist> artists, HashSet<String> genres) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("tracks", new ArrayList<>(tracks));
+        result.put("artists", new ArrayList<>(artists));
+        result.put("genres", new ArrayList<>(genres));
+        return result;
+    }
 
 }
 

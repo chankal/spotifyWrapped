@@ -1,8 +1,11 @@
 package com.example.spotifywrap.ui.home;
 
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class Artist {
+
+public class Artist  {
     private String name ;
     private String imageUrl = "" ;
     private ArrayList<String> genre;
@@ -39,8 +42,6 @@ public class Artist {
     public void setGenre(ArrayList<String> genre) {
         this.genre = genre;
     }
-
-
 
 
 

@@ -11,11 +11,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.spotifywrap.R;
+import com.example.spotifywrap.ui.home.ChangeAccount;
+import com.example.spotifywrap.ui.home.DuoWrap;
+import com.example.spotifywrap.ui.home.FirebaseFunction;
 import com.example.spotifywrap.ui.home.Login;
 import com.example.spotifywrap.ui.home.RecentSongs;
+import com.example.spotifywrap.ui.home.Song;
+import com.example.spotifywrap.ui.home.SongService;
 import com.example.spotifywrap.ui.home.TopArtists;
 import com.example.spotifywrap.ui.home.TopTracksActivity;
 import com.example.spotifywrap.ui.home.User;
+import com.example.spotifywrap.ui.home.YourWrap;
+import com.google.firebase.FirebaseApp;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,35 +35,43 @@ public class MainActivity extends AppCompatActivity {
     private static final int LOGIN_REQUEST_CODE = 1001;
     private SharedPreferences sharedPreferences;
     private Button buttonRecentlyPlayedSong;
-    private Button buttonYourWrap;
+
     private Button buttonMusicTaste;
     private Button buttonDuoWrapped;
     private Button buttonTopTracks;
-    private Button buttonTopArtists;
+    private Button buttonAccount ;
 
     private User user;
 
+    FirebaseFunction firebaseFunction;
+    SongService songService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (FirebaseApp.getApps(this).isEmpty()) {
+            FirebaseApp.initializeApp(this);
+        }
+        songService = new SongService(getApplicationContext());
 
+        buttonAccount = findViewById(R.id.accountButton);
         buttonSpotifyLogin = findViewById(R.id.buttonSpotifyLogin);
         greetingMessage = findViewById(R.id.greetingMessage);
         buttonRecentlyPlayedSong = findViewById(R.id.buttonRecentlyPlayedSong);
-        buttonYourWrap = findViewById(R.id.buttonYourWrap);
         buttonMusicTaste = findViewById(R.id.buttonMusicTaste);
         buttonDuoWrapped = findViewById(R.id.buttonDuoWrapped);
         sharedPreferences = getSharedPreferences("SPOTIFY", MODE_PRIVATE);
         buttonTopTracks = findViewById(R.id.buttonTopTracks);
 
-        SharedPreferences sharedPreferences = this.getSharedPreferences("SPOTIFY", 0);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("SPOTIFY", 0);
         greetingMessage.setText(sharedPreferences.getString("userid", "No User"));
+
 
         buttonSpotifyLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, Login.class);
-                intent.putExtra("LOGIN_REQUEST_CODE", LOGIN_REQUEST_CODE); // Add request code to the intent
+                intent.putExtra("LOGIN_REQUEST_CODE", LOGIN_REQUEST_CODE);
                 startActivityForResult(intent, LOGIN_REQUEST_CODE);
             }
         });
@@ -73,15 +91,23 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
-        buttonTopArtists = findViewById(R.id.buttonTopArtists); // Initialize buttonTopArtists
 
-        buttonTopArtists.setOnClickListener(new View.OnClickListener() {
+
+        buttonDuoWrapped.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, TopArtists.class);
+                Intent intent = new Intent(MainActivity.this, DuoWrap.class);
                 startActivity(intent);
             }
         });
+        buttonAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ChangeAccount.class);
+                startActivityForResult(intent, 300);
+            }
+        });
+
 
     }
 
@@ -99,9 +125,36 @@ public class MainActivity extends AppCompatActivity {
                 isAuthenticated = sharedPreferences.getBoolean("isAuthenticated", false);
                 String token = sharedPreferences.getString("token", "");
                 String userId = sharedPreferences.getString("userid", "");
-                String username = sharedPreferences.getString("username", "");
-                showGreetingMessage();
-                greetingMessage.setText("Welcome," + sharedPreferences.getString("username", "No User"));
+                String email = sharedPreferences.getString("email", "");
+
+                firebaseFunction = new FirebaseFunction();
+                firebaseFunction.getUsername(email, new FirebaseFunction.OnUsernameResultListener() {
+                    @Override
+                    public void onUsernameResult(String name) {
+                        String username;
+                        if (name == null) {
+                            username = sharedPreferences.getString("username", "No User");
+
+                            ArrayList<Song> wrapData = new ArrayList<>();
+                            firebaseFunction.storeUser(username, email, wrapData);
+                        } else {
+                            username = name;
+                            Log.d("STARTING", "Found username");
+                        }
+                        greetingMessage.setText("Welcome," + username);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("username", username);
+                        editor.apply();
+                    }
+                });
+
+                songService.getTopTracks(() -> {
+                    ArrayList<Song> topTracks = songService.getSongs();
+                    firebaseFunction.storeUser(sharedPreferences.getString("username", ""),
+                            email,
+                            topTracks
+                    );
+                });
 
                 showAuthenticatedViews();
 
@@ -109,8 +162,24 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("STARTING", "Not authenticated");
                 showLoginButton();
             }
-        }
+        } else if (requestCode == 300) {
+            if (resultCode == RESULT_OK) {
+                boolean isLogout = data.getBooleanExtra("isLogout", false);
+                String newUsername = data.getStringExtra("newUsername");
 
+                if (isLogout) {
+                    performLogout();
+
+                } else if (newUsername != null) {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("username", newUsername);
+                    editor.apply();
+                    greetingMessage.setText("Welcome, " + newUsername);
+                }
+            }
+        } else {
+            showAuthenticatedViews();
+        }
     }
 
     private void showAuthenticatedViews() {
@@ -118,11 +187,10 @@ public class MainActivity extends AppCompatActivity {
         greetingMessage.setText("Welcome, " + sharedPreferences.getString("username", "No User"));
         buttonSpotifyLogin.setVisibility(View.GONE);
         buttonRecentlyPlayedSong.setVisibility(View.VISIBLE);
-        buttonYourWrap.setVisibility(View.VISIBLE);
         buttonMusicTaste.setVisibility(View.VISIBLE);
         buttonDuoWrapped.setVisibility(View.VISIBLE);
         buttonTopTracks.setVisibility(View.VISIBLE);
-        buttonTopArtists.setVisibility(View.VISIBLE);
+        buttonAccount.setVisibility(View.VISIBLE);
     }
     private void showGreetingMessage() {
         greetingMessage.setVisibility(View.VISIBLE);
@@ -132,9 +200,33 @@ public class MainActivity extends AppCompatActivity {
     private void showLoginButton() {
         greetingMessage.setVisibility(View.GONE);
         buttonSpotifyLogin.setVisibility(View.VISIBLE);
+        buttonRecentlyPlayedSong.setVisibility(View.GONE);
+        buttonMusicTaste.setVisibility(View.GONE);
+        buttonDuoWrapped.setVisibility(View.GONE);
+        buttonTopTracks.setVisibility(View.GONE);
+        buttonAccount.setVisibility(View.GONE);
+
+    }
+    private void performLogout() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isAuthenticated", false);
+        editor.remove("token");
+        editor.remove("userid");
+        editor.remove("username");
+        editor.remove("email");
+        editor.apply();
+
+
+
+        showLoginButton();
+
+
+
     }
     protected void onDestroy() {
         super.onDestroy();
     }
+
+
 
 }
