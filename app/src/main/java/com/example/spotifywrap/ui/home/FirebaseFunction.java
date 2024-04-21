@@ -144,9 +144,6 @@ public class FirebaseFunction {
                             }
                         }
 
-                        //process list of songs
-
-
                         listener.onUserWrapResult(wrap);
                     } else {
                         Log.e("DisplayDuoWrapActivity", "Error getting documents: ", task.getException());
@@ -172,6 +169,7 @@ public class FirebaseFunction {
 
     private void updateUserData(Context context, String username, String email, ArrayList<Song> wrap) {
         Log.d("STARTING", "EMAILZ"+email);
+        Log.d("wrap given", wrap.toString());
         Map<String, Object> user = new HashMap<>();
         if (username != null && !username.isEmpty()) {
             user.put("username", username);
@@ -207,7 +205,6 @@ public class FirebaseFunction {
                     songMap.put("name", song.getName());
                     songMap.put("imageUrl", song.getImageUrl());
 
-                    // Convert list of artists into a list of artist names
                     List<String> artistNames = new ArrayList<>();
                     for (Artist artist : song.getArtists()) {
                         artistNames.add(artist.getName());
@@ -219,7 +216,6 @@ public class FirebaseFunction {
 
             });
         }
-
         usersRef.document(email)
                 .set(user)
                 .addOnSuccessListener(aVoid -> {

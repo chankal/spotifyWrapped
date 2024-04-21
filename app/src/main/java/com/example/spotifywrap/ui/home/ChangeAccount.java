@@ -99,7 +99,6 @@ public class ChangeAccount extends AppCompatActivity {
             editor.putString("username", newUsername);
             editor.apply();
 
-            // Set the result with the new username
             Intent resultIntent = new Intent();
             resultIntent.putExtra("newUsername", newUsername);
             setResult(RESULT_OK, resultIntent);

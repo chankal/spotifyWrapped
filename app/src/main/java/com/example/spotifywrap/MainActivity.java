@@ -140,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                             username = sharedPreferences.getString("username", "No User");
                             Log.d("NOO", sharedPreferences.getString("username", "No User"));
 
-
                         } else {
                             username = name;
                             Log.d("STARTING", "Found username");

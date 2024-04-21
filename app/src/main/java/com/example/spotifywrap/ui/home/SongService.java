@@ -172,8 +172,8 @@ public class SongService {
         return songs;
     }
     public ArrayList<Song> getTopTracks(final VolleyCallBack callBack ) {
-        String timeRange = "long_term"; // Set the time range to long_term
-        int limit = 20; // Limit the result to 5 artists
+        String timeRange = "long_term";
+        int limit = 20;
 
         String url = "https://api.spotify.com/v1/me/top/tracks?type=artists&time_range=" + timeRange + "&limit=" + limit;
         songs.clear();
