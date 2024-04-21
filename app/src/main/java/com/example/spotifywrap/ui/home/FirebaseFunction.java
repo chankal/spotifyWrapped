@@ -52,8 +52,12 @@ public class FirebaseFunction {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (DocumentSnapshot document : queryDocumentSnapshots) {
                         String username = document.getString("username");
-
-                        listener.onUsernameResult(username);
+                        if (username == null) {
+                            listener.onUsernameResult(null);
+                            return;
+                        } else {
+                            listener.onUsernameResult(username);
+                        }
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -74,12 +78,10 @@ public class FirebaseFunction {
                                 String name = (String) songMap.get("name");
                                 String imageUrl = (String) songMap.get("imageUrl");
 
-                                // Convert list of artist names into a list of artists
                                 List<Artist> artists = new ArrayList<>();
                                 List<String> artistNames = (List<String>) songMap.get("artists");
                                 if (artistNames != null) {
                                     for (String artistName : artistNames) {
-                                        // Assuming Artist class has a constructor that takes artist name
                                         artists.add(new Artist(artistName));
                                     }
                                 }
@@ -96,8 +98,6 @@ public class FirebaseFunction {
                     Log.e(TAG, "Error getting documents: " + e);
                 });
     }
-
-
     public void getWrapsForUsernames(List<String> usernames, OnUserWrapResultListener listener) {
         db.collection("Users")
                 .whereIn("username", usernames)
@@ -117,7 +117,6 @@ public class FirebaseFunction {
                                     String name = (String) songMap.get("name");
                                     String imageUrl = (String) songMap.get("imageUrl");
 
-                                    // Convert list of artist names into a list of artists
                                     List<Artist> artists = new ArrayList<>();
                                     List<String> artistNames = (List<String>) songMap.get("artists");
                                     if (artistNames != null) {
@@ -139,7 +138,6 @@ public class FirebaseFunction {
                                         wrap.add(song);
                                     }
 
-
                                 }
 
                                 wrapsMap.put(username, wrap);
@@ -156,12 +154,13 @@ public class FirebaseFunction {
                 });
     }
 
-    public void storeUser(String username, String email, ArrayList<Song> wrap) {
+    public void storeUser(Context context, String username, String email, ArrayList<Song> wrap) {
+        Log.d("STORING", username.toString());
         usersRef.document(email)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        updateUserData(username, email, wrap);
+                        updateUserData(context, username, email, wrap);
                     } else {
                         createNewUser(username, email, wrap);
                     }
@@ -171,8 +170,7 @@ public class FirebaseFunction {
                 });
     }
 
-
-    private void updateUserData(String username, String email, ArrayList<Song> wrap) {
+    private void updateUserData(Context context, String username, String email, ArrayList<Song> wrap) {
         Log.d("STARTING", "EMAILZ"+email);
         Map<String, Object> user = new HashMap<>();
         if (username != null && !username.isEmpty()) {
@@ -189,7 +187,6 @@ public class FirebaseFunction {
                 songMap.put("name", song.getName());
                 songMap.put("imageUrl", song.getImageUrl());
 
-                // Convert list of artists into a list of artist names
                 List<String> artistNames = new ArrayList<>();
                 for (Artist artist : song.getArtists()) {
                     artistNames.add(artist.getName());
@@ -199,6 +196,28 @@ public class FirebaseFunction {
                 songsList.add(songMap);
             }
             user.put("wrap", songsList);
+        } else {
+            SongService songService = new SongService(context);
+            songService.getTopTracks(() -> {
+                ArrayList<Song> topTracks = songService.getSongs();
+                List<Map<String, Object>> songsList = new ArrayList<>();
+                for (Song song : topTracks) {
+                    Map<String, Object> songMap = new HashMap<>();
+                    songMap.put("id", song.getId());
+                    songMap.put("name", song.getName());
+                    songMap.put("imageUrl", song.getImageUrl());
+
+                    // Convert list of artists into a list of artist names
+                    List<String> artistNames = new ArrayList<>();
+                    for (Artist artist : song.getArtists()) {
+                        artistNames.add(artist.getName());
+                    }
+                    songMap.put("artists", artistNames);
+                    songsList.add(songMap);
+                }
+                user.put("wrap", songsList);
+
+            });
         }
 
         usersRef.document(email)
@@ -227,7 +246,6 @@ public class FirebaseFunction {
                 songMap.put("name", song.getName());
                 songMap.put("imageUrl", song.getImageUrl());
 
-                // Convert list of artists into a list of artist names
                 List<String> artistNames = new ArrayList<>();
                 for (Artist artist : song.getArtists()) {
                     artistNames.add(artist.getName());

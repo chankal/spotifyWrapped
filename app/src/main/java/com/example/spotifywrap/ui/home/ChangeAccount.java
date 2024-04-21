@@ -94,7 +94,7 @@ public class ChangeAccount extends AppCompatActivity {
         String email = sharedPreferences.getString("email","");
 
         if (!newUsername.isEmpty()) {
-            firebaseFunction.storeUser(newUsername, email, null);
+            firebaseFunction.storeUser(getApplicationContext(),newUsername, email, null);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("username", newUsername);
             editor.apply();

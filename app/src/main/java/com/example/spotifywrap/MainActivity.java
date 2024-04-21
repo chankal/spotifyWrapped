@@ -128,15 +128,19 @@ public class MainActivity extends AppCompatActivity {
                 String email = sharedPreferences.getString("email", "");
 
                 firebaseFunction = new FirebaseFunction();
+                Log.d("USERNAME IS", sharedPreferences.getString("username", "No User"));
                 firebaseFunction.getUsername(email, new FirebaseFunction.OnUsernameResultListener() {
                     @Override
                     public void onUsernameResult(String name) {
                         String username;
+
+                        Log.d("USERNAME", name);
+
                         if (name == null) {
                             username = sharedPreferences.getString("username", "No User");
+                            Log.d("NOO", sharedPreferences.getString("username", "No User"));
 
-                            ArrayList<Song> wrapData = new ArrayList<>();
-                            firebaseFunction.storeUser(username, email, wrapData);
+
                         } else {
                             username = name;
                             Log.d("STARTING", "Found username");
@@ -150,11 +154,12 @@ public class MainActivity extends AppCompatActivity {
 
                 songService.getTopTracks(() -> {
                     ArrayList<Song> topTracks = songService.getSongs();
-                    firebaseFunction.storeUser(sharedPreferences.getString("username", ""),
+                    firebaseFunction.storeUser(getApplicationContext(), sharedPreferences.getString("username", ""),
                             email,
                             topTracks
                     );
                 });
+
 
                 showAuthenticatedViews();
 
@@ -217,16 +222,16 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
 
 
-
         showLoginButton();
-
 
 
     }
     protected void onDestroy() {
         super.onDestroy();
     }
-
+    private void storeUser(String username, String email, ArrayList<Song> topTracks) {
+        firebaseFunction.storeUser(getApplicationContext(),username, email, topTracks);
+    }
 
 
 }
